@@ -1,0 +1,40 @@
+// Prisma schema for CLI Texas Hold'em
+
+generator client {
+  provider  = "prisma-client-py"
+  interface = "sync"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int          @id @default(autoincrement())
+  username  String       @unique
+  email     String       @unique
+  password  String
+  games     GamePlayer[]
+  createdAt DateTime     @default(now())
+}
+
+model Game {
+  id        Int          @id @default(autoincrement())
+  pot       Int          @default(0)
+  status    String       @default("active")
+  winner    String?
+  players   GamePlayer[]
+  createdAt DateTime     @default(now())
+}
+
+model GamePlayer {
+  id     Int     @id @default(autoincrement())
+  userId Int
+  gameId Int
+  bet    Int     @default(0)
+  amount Int     @default(2000)
+  folded Boolean @default(false)
+  user   User    @relation(fields: [userId], references: [id])
+  game   Game    @relation(fields: [gameId], references: [id])
+}
